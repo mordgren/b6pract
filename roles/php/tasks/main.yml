@@ -1,0 +1,27 @@
+---
+# tasks file for php
+- name: Update
+  become: true
+  apt:
+    update_cache: true
+    force_apt_get: true
+
+- name: Install PHP
+  become: true
+  package:
+    name: php-fpm
+    update_cache: true
+    state: latest
+
+- name: config php
+  become: true
+  template:
+    src: /etc/ansible/roles/php/templates/php-conf.j2
+    dest: /etc/php/7.2/fpm/pool.d/www.conf
+
+- name: Restart php
+  become: true
+  ansible.builtin.systemd:
+    name: php7.2-fpm
+    state: restarted
+    enabled: true

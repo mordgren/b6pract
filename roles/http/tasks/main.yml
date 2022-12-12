@@ -1,0 +1,39 @@
+---
+# tasks file for http
+- name: Update
+  become: true
+  apt:
+    update_cache: true
+    force_apt_get: true
+
+- name: Install nginx
+  become: true
+  package:
+    name: nginx
+    update_cache: true
+    state: latest
+
+- name: config sites-availiable
+  become: true
+  template:
+    src: /etc/ansible/roles/http/templates/nginx-conf.j2
+    dest: /etc/nginx/sites-available/default
+  notify:
+  - Restart nginx
+
+- name: Documentroot
+  ansible.builtin.shell:
+    cmd: mkdir -p /opt/nginx/ansible
+
+- name: add index.php
+  become: true
+  template:
+    src: /etc/ansible/roles/http/templates/index.j2
+    dest: /opt/nginx/ansible/index.php
+
+- name: Nginx restart
+  become: true
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    enabled: true

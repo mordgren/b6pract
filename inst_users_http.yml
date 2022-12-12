@@ -1,0 +1,8 @@
+---
+- hosts: node1
+  gather_facts: true
+  become: true
+  roles:
+   - users
+   - http
+

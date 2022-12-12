@@ -1,0 +1,34 @@
+---
+# tasks file for users
+- name: Add user ansible
+  become: true
+  user: 
+    name: ansible 
+    home: /home/ansible
+    shell: /bin/bash
+
+- name: Create group ansible
+  become: true
+  group:
+    name: ansible
+    state: present
+
+- name: Adding user to group
+  become: true
+  user:
+    name: ansible
+    groups: ansible
+    append: true
+
+- name: Add ssh keys
+  become: true
+  authorized_key: 
+    user: ansible 
+    key: "{{ lookup('file', '/root/.ssh/servers.pub') }}"
+
+- name: Adding user to sudoers
+  become: true
+  lineinfile:
+    dest: /etc/sudoers
+    line: "ansible ALL=(ALL)  NOPASSWD: ALL"
+    validate: 'visudo -cf %s'
